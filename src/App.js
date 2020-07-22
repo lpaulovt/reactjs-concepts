@@ -1,60 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from './services/api';
 
-import Header from './components/Header';
-import Button from './components/Button';
+import './App.css';
+import mbIcon from './assets/mh.jpg'
+
+import Header from './components/Header/Header';
 
 function App() {
-  const [projects, setProjects] = useState(['Desenvolvimento de app', 'Desenvolvimento de portfólio', 'Front-end web']);
+  const [projects, setProjects] = useState([]);
 
-  function handleAddProject() {
+  useEffect(() => {
+    api.get('projects').then(response => {
+      setProjects(response.data);
+    });
+  }, []);
+
+
+  async function handleAddProject() {
     const projectName = document.getElementById('projectName');
-    // projects.push(`Nome do projeto: ${projectName.value} - Data de criação: ${Date.now()}`);
-    setProjects([... projects, `Nome do projeto: ${projectName.value} - Data de criação: ${Date.now()}`]);
+    const projectOwner = document.getElementById('projectOwner');
+
+    const response = await api.post('projects', {
+      title: projectName.value,
+      owner: projectOwner.value,
+    });
+
+    const project = response.data;
+
+    setProjects([...projects, project]);
 
     console.log(projects);
-
-  }
-
-  const [name, setName] = useState("");
-
-  function handleName() {
-    const inputName = document.getElementById('projectName');
-
-    setName(`${inputName.value}`);
-  }
-
-  const [value, setValue] = useState(0);
-
-  function Increment() {
-    let value1 = 1;
-    setValue(value + value1);
-  }
-
-  function decrement() {
-    let value1 = 1;
-
-    setValue(value - value1);
   }
 
   return (
     <>
-        <Header title={name}/> 
-   
-        <Header title="Projects" />
-        <ul>
-          {projects.map(project => <li key={project  }>{project}</li>)}
-        </ul>
-        
-        <h1>{projects.length}</h1>
+      <Header title="Projects" logo={mbIcon} />
+      <ul>
+        {projects.map(project => <li key={project.id}>{project.title}</li>)}
+      </ul>
 
-        <input type="text" name="" id="projectName"/>
-        <button type="button" onClick={handleAddProject}>ADD</button>
-        <button type="button" onClick={handleName}> Digite um novo título</button>
+      <h1>{projects.length}</h1>
 
-        <h1>{value}</h1>
-
-        <button type="button" onClick={Increment}> +1</button>
-        <button type="button" onClick={decrement}> -1</button>
+      <input type="text" name="" id="projectName" />
+      <input type="text" name="" id="projectOwner" />
+      <button type="button" onClick={handleAddProject}>ADD</button>
     </>
   );
 }
