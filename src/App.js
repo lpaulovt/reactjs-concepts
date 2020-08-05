@@ -46,6 +46,6 @@ function App() {
       <button type="button" onClick={handleAddProject}>ADD</button>
     </>
   );
-}
+} 
 
 export default App;
